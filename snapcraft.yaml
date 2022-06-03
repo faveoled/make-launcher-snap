@@ -1,0 +1,56 @@
+name: make-launcher
+title: make-launcher
+version: '1.0.0'
+summary: A simple GUI for creating launchers on your desktop
+description: |
+  A simple GUI for creating launchers on your desktop.
+
+base: core18
+confinement: strict
+grade: stable
+icon: snap/gui/icon.png
+
+parts:
+
+  make-launcher:
+    plugin: dump
+    source: ./local
+    source-type: local
+    organize:
+      make-launcher: usr/bin/make-launcher
+      make-launcher.desktop: usr/share/applications/make-launcher.desktop
+    stage-packages:
+      - zenity
+
+  # This part removes all the files in this snap which already exist in
+  # connected content and base snaps. Since these files will be available
+  # at runtime from the content and base snaps, they do not need to be
+  # included in this snap itself.
+  #
+  # More info: https://forum.snapcraft.io/t/reducing-the-size-of-desktop-snaps/17280#heading--cleanup-part
+  #
+  cleanup:
+    after:  # Make this part run last; list all your other parts here
+      - make-launcher
+    plugin: nil
+    build-snaps:  # List all content-snaps and base snaps you're using here
+      - core18
+      - gnome-3-28-1804
+    override-prime: |
+      set -eux
+      for snap in "core18" "gnome-3-28-1804"; do  # List all content-snaps and base snaps you're using here
+          cd "/snap/$snap/current" && find . -type f,l -exec rm -f "$SNAPCRAFT_PRIME/{}" \;
+      done
+
+apps:
+  make-launcher:
+    extensions:
+      - gnome-3-28
+    command: usr/bin/make-launcher
+    desktop: usr/share/applications/make-launcher.desktop
+    plugs:
+      - home
+
+layout:
+  /usr/share/zenity:
+    bind: $SNAP/usr/share/zenity

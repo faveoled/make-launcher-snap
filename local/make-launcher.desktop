@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Make Launcher
+Exec=make-launcher
+Terminal=false
+Icon=${SNAP}/meta/gui/make-launcher.png
